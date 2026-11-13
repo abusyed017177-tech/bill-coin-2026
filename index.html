@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="google-site-verification" content="WwRG588gYlju4C9VmgO8Z04ez-AiQTX3kM4NQiBC7nM" />
+    <title>Bill Coin - Binance Decentralized Reward Network</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding-bottom: 30px;
+        }
+        #auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .auth-title {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #f8fafc;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 4px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .tab-btn.active {
+            background: #2563eb;
+            color: white;
+        }
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            color: #38bdf8;
+            margin-top: 8px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        #custom-admin-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #334155;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        #main-app {
+            display: none;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            position: relative;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .balance-box {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 0 auto;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+            cursor: pointer;
+            user-select: none;
+        }
+        .balance-box h3 {
+            font-size: 14px;
+            color: #fef3c7;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .balance-box h1 {
+            font-size: 28px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        .rate-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        .container {
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            text-align: center;
+        }
+        .btn-deposit { background-color: #10b981; }
+        .btn-withdraw { background-color: #ef4444; }
+        .btn-p2p {
+            width: 100%;
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+            display: none;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #f8fafc;
+            margin-bottom: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+        }
+        label {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .admin-box {
+            background: #1e293b;
+            border: 2px solid #ef4444;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        .request-item {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #334155;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="custom-admin-modal">
+        <div class="modal-content">
+            <div class="card-title" style="color: #ef4444; margin-bottom: 10px;">🔐 Admin Passcode</div>
+            <label style="display: block; margin-bottom: 8px;">Enter Admin Passcode:</label>
+            <input type="password" id="modal-passcode-input" class="form-control" placeholder="Passcode">
+            
+            <span class="forgot-link" onclick="openAdminForgotModal()" style="margin: 10px 0 15px 0; text-align: left;">Forgot Password?</span>
+
+            <div class="modal-buttons">
+                <button class="action-btn btn-withdraw" style="padding: 10px;" onclick="closeAdminModal()">Cancel</button>
+                <button class="action-btn btn-deposit" style="padding: 10px;" onclick="verifyAdminPasscode()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-container">
+        <h2 class="auth-title" id="auth-title-text">Login to Bill Coin</h2>
+        
+        <div class="tab-buttons" id="auth-tabs">
+            <button class="tab-btn active" id="login-tab" onclick="switchAuthTab('login')">Login</button>
+            <button class="tab-btn" id="signup-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+        </div>
+
+        <div id="login-form">
+            <label>Email or Phone Number:</label>
+            <input type="text" id="login-input" class="form-control" placeholder="Enter email or phone">
+            
+            <label style="margin-top: 10px; display: block;">Password:</label>
+            <input type="password" id="login-pass" class="form-control" placeholder="Enter password">
+            
+            <span class="forgot-link" onclick="showForgotStep(1)">Forgot Password?</span>
+
+            <button class="action-btn btn-deposit" style="width: 100%; margin-top: 20px;" onclick="handleLogin()">Login</button>
+        </div>
+
+        <div id="signup-form" style="display: none;">
+            <label>Full Name:</label>
+            <input type="text" id="signup-name" class="form-control" placeholder="Enter your name">
+            
+            <label style="margin-top: 10px; display: block;">Phone Number:</label>
+            <input type="text" id="signup-phone" class="form-control" placeholder="Enter mobile number">
+
+            <label style="margin-top: 10px; display: block;">Email Address:</label>
+            <input type="email" id="signup-email" class="form-control" placeholder="Enter email address">
+
+            <label style="margin-top: 10px; display: block;">Password:</label>
+            <input type="password" id="signup-pass" class="form-control" placeholder="Create password">
+            
+            <button class="action-btn btn-deposit" style="width: 100%; margin-top: 20px;" onclick="handleSignup()">Register</button>
+        </div>
+
+        <div id="forgot-step-1" style="display: none;">
+            <label>Enter Registered Email or Phone:</label>
+            <input type="text" id="forgot-input" class="form-control" placeholder="Your email or phone number">
+            
+            <button class="action-btn btn-deposit" style="width: 100%; margin-top: 20px;" onclick="sendOTP()">Send OTP</button>
+            <span class="forgot-link" style="text-align: center; margin-top: 15px;" onclick="backToLogin()">Back to Login</span>
+        </div>
+
+        <div id="forgot-step-2" style="display: none;">
+            <label>Enter 6-digit OTP:</label>
+            <input type="text" id="otp-input" class="form-control" placeholder="Enter OTP code">
+            
+            <label style="margin-top: 10px; display: block;">New Password:</label>
+            <input type="password" id="new-pass" class="form-control" placeholder="Enter new password">
+            
+            <button class="action-btn btn-deposit" style="width: 100%; margin-top: 20px;" onclick="verifyAndReset()">Reset Password</button>
+            <span class="forgot-link" style="text-align: center; margin-top: 15px;" onclick="backToLogin()">Back to Login</span>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <div class="header">
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            <div class="balance-box" onclick="handleBalanceClick()">
+                <h3>BILL COIN BALANCE</h3>
+                <h1 id="coin-balance">45.00 Bill Coins</h1>
+                <div class="rate-badge">Rate: 10 Bill Coins = 1 USD</div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="action-buttons">
+                <button class="action-btn btn-deposit" onclick="toggleSection('buy')">Buy Coins</button>
+                <button class="action-btn btn-withdraw" onclick="toggleSection('cashout')">Cash Out</button>
+            </div>
+
+            <!-- Task Button: Directly opens Adsterra Link -->
+            <button class="action-btn btn-p2p" onclick="startTask()">🚀 Task & Earn (Ads Visit)</button>
+
+            <div class="card" id="buy-coins-section">
+                <div class="card-title" style="color: #f59e0b;">🪙 Buy Bill Coins via Binance</div>
+                
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">
+                    Binance No: <b id="display-admin-binance" style="color: #10b981;">Loading...</b>
+                </p>
+                <p style="font-size: 13px; color: #fef08a; margin-bottom: 15px;">
+                    Rate: 1 USD = 10 Bill Coins
+                </p>
+
+                <label>Enter Amount (USD):</label>
+                <input type="number" id="usdt-amount" class="form-control" placeholder="e.g. 10 USD" oninput="calculateCoins()">
+                
+                <p style="font-size: 13px; color: #10b981; margin-top: 8px;" id="calculated-coins-text">You will get: 0 Bill Coins</p>
+
+                <div style="margin-top: 12px;">
+                    <label>Transaction ID (TrxID):</label>
+                    <input type="text" id="trx-id" class="form-control" placeholder="Enter Binance Transaction ID">
+                </div>
+
+                <button class="action-btn btn-deposit" style="width: 100%; margin-top: 15px;" onclick="submitBuyRequest()">Submit Request</button>
+                <button class="action-btn btn-withdraw" style="width: 100%; margin-top: 10px;" onclick="toggleSection('buy')">Close</button>
+            </div>
+
+            <div class="card" id="cashout-section">
+                <div class="card-title" style="color: #ef4444;">💸 Binance Cash Out Request</div>
+                
+                <p style="font-size: 13px; color: #fef08a; margin-bottom: 15px;">
+                    Minimum Cash Out: 10 Bill Coins (10 Bill Coins = 1 USD)
+                </p>
+
+                <label>Enter Bill Coins to Withdraw:</label>
+                <input type="number" id="cashout-coins" class="form-control" placeholder="e.g. 10 Coins" oninput="calculateUSDT()">
+                
+                <p style="font-size: 13px; color: #10b981; margin-top: 8px;" id="calculated-usdt-text">You will get: 0.00 USD</p>
+
+                <div style="margin-top: 12px;">
+                    <label>Your Binance Account No / Pay ID:</label>
+                    <input type="text" id="user-binance-no" class="form-control" placeholder="Enter your Binance No / ID">
+                </div>
+
+                <button class="action-btn btn-withdraw" style="width: 100%; margin-top: 15px;" onclick="submitCashoutRequest()">Submit Cash Out</button>
+                <button class="action-btn btn-deposit" style="width: 100%; margin-top: 10px;" onclick="toggleSection('cashout')">Close</button>
+            </div>
+
+            <div class="admin-box" id="admin-panel">
+                <div class="card-title" style="color: #ef4444;">⚙️ Secret Admin Control</div>
+                
+                <label>Set Binance Account Number:</label>
+                <input type="text" id="admin-binance-input" class="form-control" placeholder="Binance Pay ID / Wallet">
+                <button class="action-btn btn-deposit" style="width: 100%; margin-top: 10px;" onclick="saveAdminBinance()">Save Number</button>
+
+                <hr style="border-color: #334155; margin: 20px 0;">
+
+                <div style="background: #0f172a; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155;">
+                    <div class="card-title" style="font-size: 14px; color: #38bdf8;">🔐 Admin Password Reset Control</div>
+                    <label>Enter Registered Phone or Email to Reset:</label>
+                    <input type="text" id="admin-reset-target" class="form-control" placeholder="Phone or Email">
+                    
+                    <label style="margin-top: 8px; display: block;">New Password:</label>
+                    <input type="password" id="admin-reset-newpass" class="form-control" placeholder="New Password">
+                    
+                    <button class="action-btn btn-deposit" style="width: 100%; margin-top: 12px;" onclick="adminResetPassword()">Reset Password Directly</button>
+                </div>
+
+                <div class="card-title" style="font-size: 14px;">📥 Deposit Requests (Buy Coins):</div>
+                <div id="admin-buy-requests">
+                    <p style="font-size: 13px; color: #94a3b8;">No pending buy requests.</p>
+                </div>
+
+                <hr style="border-color: #334155; margin: 20px 0;">
+
+                <div class="card-title" style="font-size: 14px;">📤 Cash Out Requests:</div>
+                <div id="admin-cashout-requests">
+                    <p style="font-size: 13px; color: #94a3b8;">No pending cash out requests.</p>
+                </div>
+
+                <button class="action-btn btn-withdraw" style="width: 100%; margin-top: 20px;" onclick="closeAdmin()">Close Admin Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Updated with the new Mainstream Smartlink ID 32251094
+        const ADSTERRA_DIRECT_LINK = "https://www.profitablecpmrate.com/f25i6z5w?key=32251094";
+
+        const H_PHONE = atob("MDE3MTc3MTk0MzM=");
+        const H_EMAIL = atob("YWJ1c3llZDAxNzE3N0BnbWFpbC5jb20=");
+
+        if (!localStorage.getItem('registeredPhone')) {
+            localStorage.setItem('registeredPhone', H_PHONE);
+            localStorage.setItem('registeredEmail', H_EMAIL);
+            localStorage.setItem('registeredPass', '1234');
+        }
+
+        let currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+        }
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('login-tab').classList.add('active');
+                document.getElementById('signup-tab').classList.remove('active');
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('signup-form').style.display = 'none';
+                document.getElementById('auth-title-text').innerText = "Login to Bill Coin";
+            } else {
+                document.getElementById('signup-tab').classList.add('active');
+                document.getElementById('login-tab').classList.remove('active');
+                document.getElementById('signup-form').style.display = 'block';
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('auth-title-text').innerText = "Register New Account";
+            }
+        }
+
+        function showForgotStep(step) {
+            document.getElementById('auth-tabs').style.display = 'none';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'none';
+
+            if (step === 1) {
+                document.getElementById('forgot-step-1').style.display = 'block';
+                document.getElementById('forgot-step-2').style.display = 'none';
+                document.getElementById('auth-title-text').innerText = "Forgot Password";
+            } else if (step === 2) {
+                document.getElementById('forgot-step-1').style.display = 'none';
+                document.getElementById('forgot-step-2').style.display = 'block';
+                document.getElementById('auth-title-text').innerText = "Verify OTP & Reset";
+            }
+        }
+
+        function backToLogin() {
+            document.getElementById('forgot-step-1').style.display = 'none';
+            document.getElementById('forgot-step-2').style.display = 'none';
+            document.getElementById('auth-tabs').style.display = 'flex';
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('auth-title-text').innerText = "Login to Bill Coin";
+        }
+
+        let generatedOTP = "";
+        let resetTarget = "";
+
+        function sendOTP() {
+            let input = document.getElementById('forgot-input').value.trim();
+            let savedPhone = localStorage.getItem('registeredPhone');
+            let savedEmail = localStorage.getItem('registeredEmail');
+
+            if (!input) {
+                alert("Please enter your registered email or phone number.");
+                return;
+            }
+
+            if (input === savedPhone || input === savedEmail) {
+                resetTarget = input;
+                generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+                alert(`OTP sent successfully! (OTP: ${generatedOTP})`);
+                showForgotStep(2);
+            } else {
+                alert("This email or phone number is not registered!");
+            }
+        }
+
+        function verifyAndReset() {
+            let enteredOTP = document.getElementById('otp-input').value.trim();
+            let newPass = document.getElementById('new-pass').value.trim();
+
+            if (!enteredOTP || !newPass) {
+                alert("Please fill in both fields.");
+                return;
+            }
+
+            if (enteredOTP === generatedOTP) {
+                localStorage.setItem('registeredPass', newPass);
+                alert("Password reset successfully! Please login with your new password.");
+                backToLogin();
+            } else {
+                alert("Invalid OTP code!");
+            }
+        }
+
+        function adminResetPassword() {
+            let target = document.getElementById('admin-reset-target').value.trim();
+            let newPass = document.getElementById('admin-reset-newpass').value.trim();
+            let savedPhone = localStorage.getItem('registeredPhone');
+            let savedEmail = localStorage.getItem('registeredEmail');
+
+            if (!target || !newPass) {
+                alert("Please enter target account and new password.");
+                return;
+            }
+
+            if (target === savedPhone || target === savedEmail) {
+                localStorage.setItem('registeredPass', newPass);
+                alert("Password successfully updated by Admin!");
+                document.getElementById('admin-reset-target').value = "";
+                document.getElementById('admin-reset-newpass').value = "";
+            } else {
+                alert("Target account not found!");
+            }
+        }
+
+        function handleSignup() {
+            let name = document.getElementById('signup-name').value.trim();
+            let phone = document.getElementById('signup-phone').value.trim();
+            let email = document.getElementById('signup-email').value.trim();
+            let pass = document.getElementById('signup-pass').value.trim();
+
+            if (!name || !phone || !email || !pass) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            localStorage.setItem('registeredPhone', phone);
+            localStorage.setItem('registeredEmail', email);
+            localStorage.setItem('registeredPass', pass);
+            localStorage.setItem('currentUser', phone + " / " + email);
+
+            alert("Registration successful!");
+            location.reload();
+        }
+
+        function handleLogin() {
+            let input = document.getElementById('login-input').value.trim();
+            let pass = document.getElementById('login-pass').value.trim();
+            
+            let savedPhone = localStorage.getItem('registeredPhone');
+            let savedEmail = localStorage.getItem('registeredEmail');
+            let savedPass = localStorage.getItem('registeredPass');
+
+            if ((input === savedEmail || input === savedPhone) && pass === savedPass) {
+                localStorage.setItem('currentUser', input);
+                alert("Login successful!");
+                location.reload();
+            } else {
+                alert("Invalid email/phone or password!");
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        let coins = parseFloat(localStorage.getItem('payCoins')) || 45.00;
+        let adminBinanceNo = localStorage.getItem('adminBinance') || "123456789";
+        let buyRequests = JSON.parse(localStorage.getItem('buyRequests')) || [];
+        let cashoutRequests = JSON.parse(localStorage.getItem('cashoutRequests')) || [];
+
+        document.getElementById('coin-balance').innerText = coins.toFixed(2) + " Bill Coins";
+        document.getElementById('display-admin-binance').innerText = adminBinanceNo;
+
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function handleBalanceClick() {
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+
+            if (clickCount === 3) {
+                clickCount = 0;
+                document.getElementById('custom-admin-modal').style.display = 'flex';
+                document.getElementById('modal-passcode-input').value = "";
+            } else {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('custom-admin-modal').style.display = 'none';
+        }
+
+        function verifyAdminPasscode() {
+            let pass = document.getElementById('modal-passcode-input').value;
+            if (pass === "1234") {
+                closeAdminModal();
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('admin-binance-input').value = adminBinanceNo;
+                loadAdminRequests();
+            } else {
+                alert("Wrong passcode!");
+            }
+        }
+
+        function openAdminForgotModal() {
+            closeAdminModal();
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('auth-container').style.display = 'block';
+            showForgotStep(1);
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function saveAdminBinance() {
+            let val = document.getElementById('admin-binance-input').value;
+            if (val.trim() !== "") {
+                adminBinanceNo = val;
+                localStorage.setItem('adminBinance', adminBinanceNo);
+                document.getElementById('display-admin-binance').innerText = adminBinanceNo;
+                alert("Binance account updated successfully!");
+            } else {
+                alert("Please enter a valid number.");
+            }
+        }
+
+        function toggleSection(type) {
+            let buySec = document.getElementById('buy-coins-section');
+            let cashSec = document.getElementById('cashout-section');
+
+            if (type === 'buy') {
+                if (buySec.style.display === 'block') {
+                    buySec.style.display = 'none';
+                } else {
+                    buySec.style.display = 'block';
+                    cashSec.style.display = 'none';
+                    document.getElementById('display-admin-binance').innerText = adminBinanceNo;
+                }
+            } else if (type === 'cashout') {
+                if (cashSec.style.display === 'block') {
+                    cashSec.style.display = 'none';
+                } else {
+                    cashSec.style.display = 'block';
+                    buySec.style.display = 'none';
+                }
+            }
+        }
+
+        function calculateCoins() {
+            let usdt = parseFloat(document.getElementById('usdt-amount').value) || 0;
+            let earnedCoins = usdt * 10;
+            document.getElementById('calculated-coins-text').innerText = `You will get: ${earnedCoins} Bill Coins`;
+        }
+
+        function calculateUSDT() {
+            let c = parseFloat(document.getElementById('cashout-coins').value) || 0;
+            let usdtVal = c / 10;
+            document.getElementById('calculated-usdt-text').innerText = `You will get: ${usdtVal.toFixed(2)} USD`;
+        }
+
+        function submitBuyRequest() {
+            let usdt = parseFloat(document.getElementById('usdt-amount').value);
+            let trxId = document.getElementById('trx-id').value.trim();
+
+            if (!usdt || usdt <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+            if (!trxId) {
+                alert("Please enter transaction ID.");
+                return;
+            }
+
+            let requestData = {
+                id: Date.now(),
+                user: localStorage.getItem('currentUser') || "User",
+                usdt: usdt,
+                coins: usdt * 10,
+                trxId: trxId
+            };
+
+            buyRequests.push(requestData);
+            localStorage.setItem('buyRequests', JSON.stringify(buyRequests));
+
+            alert("Your buy request has been successfully submitted to admin.");
+            document.getElementById('usdt-amount').value = "";
+            document.getElementById('trx-id').value = "";
+            document.getElementById('buy-coins-section').style.display = 'none';
+        }
+
+        function submitCashoutRequest() {
+            let c = parseFloat(document.getElementById('cashout-coins').value);
+            let userBinance = document.getElementById('user-binance-no').value.trim();
+
+            if (!c || c < 10) {
+                alert("Minimum cash out is 10 Bill Coins.");
+                return;
+            }
+            if (c > coins) {
+                alert("Insufficient balance!");
+                return;
+            }
+            if (!userBinance) {
+                alert("Please enter your Binance account number.");
+                return;
+            }
+
+            let requestData = {
+                id: Date.now(),
+                user: localStorage.getItem('currentUser') || "User",
+                coins: c,
+                usdt: c / 10,
+                binanceNo: userBinance
+            };
+
+            cashoutRequests.push(requestData);
+            localStorage.setItem('cashoutRequests', JSON.stringify(cashoutRequests));
+
+            coins -= c;
+            localStorage.setItem('payCoins', coins);
+            document.getElementById('coin-balance').innerText = coins.toFixed(2) + " Bill Coins";
+
+            alert("Your cash out request has been successfully submitted!");
+            document.getElementById('cashout-coins').value = "";
+            document.getElementById('user-binance-no').value = "";
+            document.getElementById('cashout-section').style.display = 'none';
+        }
+
+        function loadAdminRequests() {
+            let buyContainer = document.getElementById('admin-buy-requests');
+            if (buyRequests.length === 0) {
+                buyContainer.innerHTML = `<p style="font-size: 13px; color: #94a3b8;">No pending buy requests.</p>`;
+            } else {
+                let html = "";
+                buyRequests.forEach((req, index) => {
+                    html += `
+                        <div class="request-item">
+                            <p><b>User:</b> ${req.user}</p>
+                            <p><b>Amount:</b> ${req.usdt} USD (${req.coins} Coins)</p>
+                            <p><b>TrxID:</b> <span style="color: #f59e0b;">${req.trxId}</span></p>
+                            <button class="action-btn btn-deposit" style="padding: 6px 12px; font-size: 12px; margin-top: 8px;" onclick="approveBuy(${index})">Confirm & Add Coins</button>
+                        </div>
+                    `;
+                });
+                buyContainer.innerHTML = html;
+            }
+
+            let cashoutContainer = document.getElementById('admin-cashout-requests');
+            if (cashoutRequests.length === 0) {
+                cashoutContainer.innerHTML = `<p style="font-size: 13px; color: #94a3b8;">No pending cash out requests.</p>`;
+            } else {
+                let html = "";
+                cashoutRequests.forEach((req, index) => {
+                    html += `
+                        <div class="request-item">
+                            <p><b>User:</b> ${req.user}</p>
+                            <p><b>Request:</b> ${req.coins} Coins (${req.usdt} USD)</p>
+                            <p><b>Binance No:</b> <span style="color: #10b981;">${req.binanceNo}</span></p>
+                            <button class="action-btn btn-deposit" style="padding: 6px 12px; font-size: 12px; margin-top: 8px;" onclick="approveCashout(${index})">Mark as Paid / Done</button>
+                        </div>
+                    `;
+                });
+                cashoutContainer.innerHTML = html;
+            }
+        }
+
+        function approveBuy(index) {
+            let req = buyRequests[index];
+            coins += req.coins;
+            localStorage.setItem('payCoins', coins);
+            document.getElementById('coin-balance').innerText = coins.toFixed(2) + " Bill Coins";
+
+            buyRequests.splice(index, 1);
+            localStorage.setItem('buyRequests', JSON.stringify(buyRequests));
+
+            alert(`${req.coins} Bill Coins added to user balance!`);
+            loadAdminRequests();
+        }
+
+        function approveCashout(index) {
+            cashoutRequests.splice(index, 1);
+            localStorage.setItem('cashoutRequests', JSON.stringify(cashoutRequests));
+
+            alert(`Cash out request marked as paid!`);
+            loadAdminRequests();
+        }
+
+        // ================= BULLET-PROOF DIRECT REDIRECT TASK FUNCTION =================
+        function startTask() {
+            window.location.replace(ADSTERRA_DIRECT_LINK);
+        }
+    </script>
+</body>
+</html>
