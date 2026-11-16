@@ -205,6 +205,18 @@
             font-size: 13px;
             color: #94a3b8;
         }
+        .ad-banner-320x50 {
+            width: 100%;
+            max-width: 320px;
+            min-height: 50px;
+            margin: 16px auto 4px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #0f172a;
+        }
         .admin-box {
             background: #1e293b;
             border: 2px solid #ef4444;
@@ -337,22 +349,43 @@
 
                 <button class="action-btn btn-deposit" style="width: 100%; margin-top: 15px;" onclick="submitBuyRequest()">Submit Request</button>
                 <button class="action-btn btn-withdraw" style="width: 100%; margin-top: 10px;" onclick="toggleSection('buy')">Close</button>
+
+                <!-- Adsterra 320x50 Banner inside form block -->
+                <div class="ad-banner-320x50" id="adsterra-banner-320x50">
+                    <script>
+                      atOptions = {
+                        'key' : 'f09c1a6947ae0b88673fb13a3cb42322',
+                        'format' : 'iframe',
+                        'height' : 50,
+                        'width' : 320,
+                        'params' : {}
+                      };
+                    </script>
+                    <script src="https://bicea.org/22/f09c1a6947ae0b88673fb13a3cb42322"></script>
+                </div>
             </div>
 
             <div class="card" id="cashout-section">
-                <div class="card-title" style="color: #ef4444;">💸 Binance Cash Out Request</div>
+                <div class="card-title" style="color: #ef4444;">💸 Cash Out Request (Binance / bKash)</div>
                 
                 <p style="font-size: 13px; color: #fef08a; margin-bottom: 15px;">
                     Minimum Cash Out: 10 Bill Coins (10 Bill Coins = 1 USD)
                 </p>
 
-                <label>Enter Bill Coins to Withdraw:</label>
-                <input type="number" id="cashout-coins" class="form-control" placeholder="e.g. 10 Coins" oninput="calculateUSDT()">
-                
-                <p style="font-size: 13px; color: #10b981; margin-top: 8px;" id="calculated-usdt-text">You will get: 0.00 USD</p>
+                <label>Select Cash Out Method:</label>
+                <select id="cashout-method" class="form-control" onchange="updateCashoutMethodUI()">
+                    <option value="Binance">Binance</option>
+                    <option value="bKash">bKash</option>
+                </select>
 
                 <div style="margin-top: 12px;">
-                    <label>Your Binance Account No / Pay ID:</label>
+                    <label>Enter Bill Coins to Withdraw:</label>
+                    <input type="number" id="cashout-coins" class="form-control" placeholder="e.g. 10 Coins" oninput="calculateUSDT()">
+                    <p style="font-size: 13px; color: #10b981; margin-top: 8px;" id="calculated-usdt-text">You will get: 0.00 USD</p>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <label id="cashout-account-label">Your Binance Account No / Pay ID:</label>
                     <input type="text" id="user-binance-no" class="form-control" placeholder="Enter your Binance No / ID">
                 </div>
 
@@ -387,7 +420,7 @@
 
                 <hr style="border-color: #334155; margin: 20px 0;">
 
-                <div class="card-title" style="font-size: 14px;">📤 Cash Out Requests:</div>
+                <div class="card-title" style="font-size: 14px;">📤 Cash Out Requests (Binance & bKash):</div>
                 <div id="admin-cashout-requests">
                     <p style="font-size: 13px; color: #94a3b8;">No pending cash out requests.</p>
                 </div>
@@ -641,7 +674,22 @@
                 } else {
                     cashSec.style.display = 'block';
                     buySec.style.display = 'none';
+                    updateCashoutMethodUI();
                 }
+            }
+        }
+
+        function updateCashoutMethodUI() {
+            let method = document.getElementById('cashout-method').value;
+            let labelEl = document.getElementById('cashout-account-label');
+            let inputEl = document.getElementById('user-binance-no');
+
+            if (method === 'bKash') {
+                labelEl.innerText = "Your bKash Account Number:";
+                inputEl.placeholder = "Enter your bKash number (e.g. 017XXXXXXXX)";
+            } else {
+                labelEl.innerText = "Your Binance Account No / Pay ID:";
+                inputEl.placeholder = "Enter your Binance No / ID";
             }
         }
 
@@ -688,8 +736,9 @@
         }
 
         function submitCashoutRequest() {
+            let method = document.getElementById('cashout-method').value;
             let c = parseFloat(document.getElementById('cashout-coins').value);
-            let userBinance = document.getElementById('user-binance-no').value.trim();
+            let accountNo = document.getElementById('user-binance-no').value.trim();
 
             if (!c || c < 10) {
                 alert("Minimum cash out is 10 Bill Coins.");
@@ -699,17 +748,19 @@
                 alert("Insufficient balance!");
                 return;
             }
-            if (!userBinance) {
-                alert("Please enter your Binance account number.");
+            if (!accountNo) {
+                alert(method === 'bKash' ? "Please enter your bKash number." : "Please enter your Binance account number.");
                 return;
             }
 
             let requestData = {
                 id: Date.now(),
                 user: localStorage.getItem('currentUser') || "User",
+                method: method,
                 coins: c,
                 usdt: c / 10,
-                binanceNo: userBinance
+                accountNo: accountNo,
+                binanceNo: accountNo
             };
 
             cashoutRequests.push(requestData);
@@ -719,7 +770,7 @@
             localStorage.setItem('payCoins', coins);
             document.getElementById('coin-balance').innerText = coins.toFixed(2) + " Bill Coins";
 
-            alert("Your cash out request has been successfully submitted!");
+            alert(`Your ${method} cash out request has been successfully submitted!`);
             document.getElementById('cashout-coins').value = "";
             document.getElementById('user-binance-no').value = "";
             document.getElementById('cashout-section').style.display = 'none';
@@ -750,11 +801,15 @@
             } else {
                 let html = "";
                 cashoutRequests.forEach((req, index) => {
+                    let methodName = req.method || "Binance";
+                    let accNumber = req.accountNo || req.binanceNo || "";
+                    let methodColor = methodName === "bKash" ? "#ec4899" : "#10b981";
                     html += `
                         <div class="request-item">
                             <p><b>User:</b> ${req.user}</p>
+                            <p><b>Method:</b> <span style="color: ${methodColor}; font-weight: bold;">${methodName}</span></p>
                             <p><b>Request:</b> ${req.coins} Coins (${req.usdt} USD)</p>
-                            <p><b>Binance No:</b> <span style="color: #10b981;">${req.binanceNo}</span></p>
+                            <p><b>${methodName} Account:</b> <span style="color: #10b981;">${accNumber}</span></p>
                             <button class="action-btn btn-deposit" style="padding: 6px 12px; font-size: 12px; margin-top: 8px;" onclick="approveCashout(${index})">Mark as Paid / Done</button>
                         </div>
                     `;
